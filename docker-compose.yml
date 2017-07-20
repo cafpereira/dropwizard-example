@@ -1,0 +1,13 @@
+# https://github.com/wnameless/docker-oracle-xe-11g
+# db: localhost:1521
+# user: system
+# pass: admin
+# SID: xe
+version: '2'
+services:
+  oracledb:
+    image: wnameless/oracle-xe-11g:16.04
+    volumes:
+      - ./db/oracle:/docker-entrypoint-initdb.d
+    ports:
+      - "1521:1521"

@@ -1,0 +1,20 @@
+logging:
+  level: INFO
+  loggers:
+    com.acme: DEBUG
+
+template: Hello, %s!
+defaultName: Stranger
+
+database:
+  driverClass: oracle.jdbc.driver.OracleDriver
+  user: system
+  password: admin
+  url: jdbc:oracle:thin:@localhost:1521:xe
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 1s
+  validationQuery: "SELECT 1 FROM DUAL"
+  minSize: 8
+  maxSize: 32
+  checkConnectionWhileIdle: false
