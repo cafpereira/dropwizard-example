@@ -64,6 +64,7 @@ public class DropwizardApp extends Application<DropwizardAppConfiguration> {
         environment.jersey().register(new PersonResource(personDAO));
 
         // Configure JDBI
+        // https://github.com/stevenalexander/dropwizard-jdbi
         final DBIFactory factory = new DBIFactory();
         final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "oracle");
         final UserDAO dao = jdbi.onDemand(UserDAO.class);
