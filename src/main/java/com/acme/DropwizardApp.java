@@ -57,7 +57,7 @@ public class DropwizardApp extends Application<DropwizardAppConfiguration> {
         bootstrap.addBundle(migrations);
         // Configure Flyway
         // https://github.com/dropwizard/dropwizard-flyway
-        bootstrap.addBundle(flyway);
+        // bootstrap.addBundle(flyway);
     }
 
     @Override
