@@ -2,14 +2,19 @@ package com.acme;
 
 import com.acme.core.Person;
 import com.acme.db.PersonDAO;
+import com.acme.db.UserDAO;
 import com.acme.health.TemplateHealthCheck;
 import com.acme.resources.HelloWorldResource;
+import com.acme.resources.PersonResource;
+import com.acme.resources.UserResource;
 import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.hibernate.HibernateBundle;
+import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.skife.jdbi.v2.DBI;
 
 public class DropwizardApp extends Application<DropwizardAppConfiguration> {
 
@@ -45,18 +50,24 @@ public class DropwizardApp extends Application<DropwizardAppConfiguration> {
     @Override
     public void run(final DropwizardAppConfiguration configuration,
                     final Environment environment) {
+        final TemplateHealthCheck healthCheck =
+                new TemplateHealthCheck(configuration.getTemplate());
+        environment.healthChecks().register("template", healthCheck);
+
         final HelloWorldResource resource = new HelloWorldResource(
                 configuration.getTemplate(),
                 configuration.getDefaultName()
         );
         environment.jersey().register(resource);
 
-        final TemplateHealthCheck healthCheck =
-                new TemplateHealthCheck(configuration.getTemplate());
-        environment.healthChecks().register("template", healthCheck);
-
         final PersonDAO personDAO = new PersonDAO(hibernate.getSessionFactory());
-//        environment.jersey().register(new UserResource(personDAO));
+        environment.jersey().register(new PersonResource(personDAO));
+
+        // Configure JDBI
+        final DBIFactory factory = new DBIFactory();
+        final DBI jdbi = factory.build(environment, configuration.getDataSourceFactory(), "oracle");
+        final UserDAO dao = jdbi.onDemand(UserDAO.class);
+        environment.jersey().register(new UserResource(dao));
     }
 
 }
