@@ -9,11 +9,14 @@ import com.acme.resources.PersonResource;
 import com.acme.resources.UserResource;
 import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.db.PooledDataSourceFactory;
+import io.dropwizard.flyway.FlywayBundle;
 import io.dropwizard.hibernate.HibernateBundle;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import org.flywaydb.core.Flyway;
 import org.skife.jdbi.v2.DBI;
 
 public class DropwizardApp extends Application<DropwizardAppConfiguration> {
@@ -26,6 +29,13 @@ public class DropwizardApp extends Application<DropwizardAppConfiguration> {
     };
 
     private final MigrationsBundle<DropwizardAppConfiguration> migrations = new MigrationsBundle<DropwizardAppConfiguration>() {
+        @Override
+        public DataSourceFactory getDataSourceFactory(DropwizardAppConfiguration configuration) {
+            return configuration.getDataSourceFactory();
+        }
+    };
+
+    private final FlywayBundle<DropwizardAppConfiguration> flyway = new FlywayBundle<DropwizardAppConfiguration>() {
         @Override
         public DataSourceFactory getDataSourceFactory(DropwizardAppConfiguration configuration) {
             return configuration.getDataSourceFactory();
@@ -45,6 +55,9 @@ public class DropwizardApp extends Application<DropwizardAppConfiguration> {
     public void initialize(final Bootstrap<DropwizardAppConfiguration> bootstrap) {
         bootstrap.addBundle(hibernate);
         bootstrap.addBundle(migrations);
+        // Configure Flyway
+        // https://github.com/dropwizard/dropwizard-flyway
+        bootstrap.addBundle(flyway);
     }
 
     @Override
